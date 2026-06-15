@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# 模型权重（大文件，按需自动下载/生成）
+*.pt
+*.pth
+*.onnx
+*.caffemodel
+
+# 隐私：真实老照片不上传公开仓库
+素材/真实老照片/
+
+# 可复现的中间产物与输出（用 degrade.py / 修复流水线重生成）
+素材/合成老照片/
+结果/
+
+# 系统
+.DS_Store
+Thumbs.db
