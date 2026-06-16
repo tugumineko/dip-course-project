@@ -1,14 +1,14 @@
-# 运行环境：conda env "ai-service"（Python 3.10）
-# 启动：E:\miniconda3\envs\ai-service\python.exe main.py
+# 老照片修复与增强馆 -- 运行依赖
+# 运行环境: conda env "ai-service" (Python 3.10)
+# 启动: E:\miniconda3\envs\ai-service\python.exe main.py
 #
-# 核心依赖（ai-service 已装齐）：
-torch>=2.5            # 风格迁移（GPU, cu121）
-torchvision>=0.20     # 预训练 VGG19
+# 核心依赖 (ai-service 已装齐):
 opencv-python>=4.10   # 经典图像处理
 numpy>=2.0
-scipy>=1.15           # 滤波 / SSIM 回退
+scipy>=1.15           # 滤波 / SSIM
 Pillow>=10            # tkinter 图像显示
 matplotlib>=3.8       # 直方图 / 前后对比图
-pywavelets>=1.6       # 第十章 小波去噪（可选）
-# 可选：
-# scikit-image        # 更精确的 SSIM（缺则自动用 scipy 回退）
+pywavelets>=1.6       # 第十章 小波去噪
+# 风格迁移 (GPU 可选, 无则回退 CPU):
+torch>=2.5            # GPU 版需从 pytorch.org 按 CUDA 版本安装
+torchvision>=0.20     # 预训练 VGG19

@@ -541,13 +541,24 @@ class App:
 
     # ── preview ─────────────────────────────────────────
 
+    def _preview_max(self):
+        """Compute preview size from current window geometry."""
+        try:
+            avail = self.lbl_orig.winfo_height()
+            if avail > 50:
+                return max(200, avail - 10)
+        except Exception:
+            pass
+        return PREVIEW_MAX
+
     def _update_preview(self):
         if self.original is None:
             return
+        mx = self._preview_max()
         self._photo_orig = ImageTk.PhotoImage(
-            _fit(_cv2pil(self.original), PREVIEW_MAX))
+            _fit(_cv2pil(self.original), mx))
         self._photo_curr = ImageTk.PhotoImage(
-            _fit(_cv2pil(self.current), PREVIEW_MAX))
+            _fit(_cv2pil(self.current), mx))
         self.lbl_orig.configure(image=self._photo_orig, text="")
         self.lbl_curr.configure(image=self._photo_curr, text="")
         self.lbl_orig_info.configure(text=basic.info(self.original))
