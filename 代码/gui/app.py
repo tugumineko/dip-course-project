@@ -71,7 +71,7 @@ def _wiener_deblur(img, length=15, angle=0, k=0.01):
 #   "bool"  -> ()
 
 OP_GROUPS = [
-    ("基础操作 (第二章)", [
+    ("基础操作", [
         ("灰度化", basic.to_gray, []),
         ("转彩色", basic.to_bgr, []),
         ("旋转", basic.rotate,
@@ -79,7 +79,7 @@ OP_GROUPS = [
         ("缩放", basic.resize,
          [("scale", "倍率", "float", 0.5, 0.1, 4.0)]),
     ]),
-    ("对比度增强 (第四章)", [
+    ("对比度增强", [
         ("直方图均衡", enhance.hist_equalize, []),
         ("CLAHE", enhance.clahe, [
             ("clip", "对比度限制", "float", 2.0, 0.5, 10.0),
@@ -97,7 +97,7 @@ OP_GROUPS = [
          [("gamma", "gamma", "float", 1.0, 0.1, 5.0)]),
         ("白平衡", enhance.white_balance, []),
     ]),
-    ("平滑去噪 (第六章)", [
+    ("平滑去噪", [
         ("均值滤波", smooth.mean_blur,
          [("k", "核大小", "int", 3, 3, 15)]),
         ("中值滤波", smooth.median_blur,
@@ -114,14 +114,14 @@ OP_GROUPS = [
         ("非局部均值", smooth.nlmeans,
          [("h", "降噪强度", "int", 10, 3, 30)]),
     ]),
-    ("锐化 (第七章)", [
+    ("锐化", [
         ("Laplacian锐化", sharpen.laplacian_sharpen,
          [("strength", "强度", "float", 1.0, 0.1, 5.0)]),
         ("Sobel边缘", sharpen.sobel_edges, []),
         ("USM锐化", sharpen.unsharp_mask,
          [("amount", "强度", "float", 1.0, 0.1, 5.0)]),
     ]),
-    ("分割/边缘 (第五章)", [
+    ("分割/边缘", [
         ("固定阈值", segment.threshold,
          [("t", "阈值", "int", 127, 0, 255)]),
         ("Otsu自动阈值", lambda img: segment.otsu(img)[0], []),
@@ -134,7 +134,7 @@ OP_GROUPS = [
             ("t2", "高阈值", "int", 200, 0, 255),
         ]),
     ]),
-    ("形态学 (第八章)", [
+    ("形态学", [
         ("腐蚀", morphology.erode,
          [("k", "核大小", "int", 3, 3, 15), ("it", "迭代", "int", 1, 1, 5)]),
         ("膨胀", morphology.dilate,
@@ -148,7 +148,7 @@ OP_GROUPS = [
         ("顶帽", morphology.tophat,
          [("k", "核大小", "int", 9, 3, 31)]),
     ]),
-    ("图像恢复 (第九章)", [
+    ("图像恢复", [
         ("模拟运动模糊", _motion_blur, [
             ("length", "核长度", "int", 15, 3, 50),
             ("angle", "角度", "int", 0, -90, 90),
@@ -166,7 +166,7 @@ OP_GROUPS = [
             ("k", "噪信比K", "float", 0.01, 0.001, 0.1),
         ]),
     ]),
-    ("频域处理 (第3.2章)", [
+    ("频域处理", [
         ("傅里叶频谱", frequency.spectrum, []),
         ("理想低通", frequency.ideal_lowpass,
          [("d0", "截止频率", "int", 30, 5, 200)]),
@@ -184,7 +184,7 @@ OP_GROUPS = [
 ]
 
 if wavelet.available():
-    OP_GROUPS.append(("小波去噪 (第十章)", [
+    OP_GROUPS.append(("小波去噪", [
         ("小波软阈值", wavelet.wavelet_denoise,
          [("thresh", "阈值", "float", 20.0, 5.0, 100.0)]),
     ]))
