@@ -182,13 +182,13 @@ slides.append(f"""
 slides.append(f"""
 <section class="slide left-align" id="s10">
   <span class="tag">高级功能</span>
-  <h2>VGG 自定义艺术风格迁移：保留，但不做默认主风格</h2>
+  <h2>VGG 自定义艺术风格迁移：高级个性化输出</h2>
   <div class="cols">
     <div class="col"><img src="{img('vgg_家庭暖调风格迁移.jpg')}" style="max-width:100%;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.35)"><p class="mini" style="text-align:center;margin-top:6px">家庭暖调风格迁移结果</p></div>
     <div class="col">
-      <div class="card"><h3>为什么保留 VGG</h3><p>Gatys 方法体现 CNN 特征图和 Gram 矩阵，支持任意用户上传风格图，适合作为高级自定义功能。</p></div>
-      <div class="card"><h3>为什么不做默认</h3><p>逐图优化较慢，且名画风格不一定符合家庭照片纪念语境；默认纪念版改用传统模板，即时且更温和。</p></div>
-      <div class="card"><h3>风格参考</h3><p>新增暖调家庭记忆风格图，替代《星空》作为主展示风格。</p></div>
+      <div class="card"><h3>模块目的</h3><p>Gatys 方法体现 CNN 特征图和 Gram 矩阵，支持任意用户上传风格图，适合作为高级个性化输出。</p></div>
+      <div class="card"><h3>工程特点</h3><p>使用预训练 VGG19，不训练网络；逐图优化输出像素，适合展示内容特征和风格特征的组合。</p></div>
+      <div class="card"><h3>风格参考</h3><p>暖调家庭记忆风格图提供柔和、怀旧、偏家庭相册语境的艺术参考。</p></div>
     </div>
   </div>
 </section>
