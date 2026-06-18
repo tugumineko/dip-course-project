@@ -1,6 +1,6 @@
-"""艺术纪念版生成面板 -- 后台线程运行 Gatys 优化法，避免 UI 卡死。
+"""自定义艺术风格迁移面板 -- 后台线程运行 Gatys 优化法，避免 UI 卡死。
 
-从主窗口点击“生成艺术纪念版”打开此面板。
+从主窗口点击“自定义艺术风格迁移（VGG）”打开此面板。
 选择/上传风格图 -> 调节参数 -> 后台线程 stylize() -> 完成后回调主窗口。
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ class StylePanel(tk.Toplevel):
         on_done:     callback(result_bgr) 迁移完成后调用
         """
         super().__init__(parent)
-        self.title("艺术纪念版生成")
+        self.title("自定义艺术风格迁移（VGG）")
         self.geometry("560x500")
         self.resizable(False, False)
         self.transient(parent)
@@ -113,7 +113,7 @@ class StylePanel(tk.Toplevel):
         self._progress = ttk.Progressbar(self, mode="determinate")
         self._progress.pack(fill=tk.X, padx=10, pady=2)
 
-        self._stat = tk.StringVar(value="选择风格图后点击 [开始迁移]")
+        self._stat = tk.StringVar(value="选择适合家庭纪念的风格图后点击 [开始迁移]")
         ttk.Label(self, textvariable=self._stat).pack(
             anchor="w", padx=10, pady=2)
 
@@ -201,7 +201,7 @@ class StylePanel(tk.Toplevel):
         self._running = False
         self._btn_go.configure(state="normal")
         self._stat.set(f"失败: {msg}")
-        messagebox.showerror("艺术纪念版生成失败", msg, parent=self)
+        messagebox.showerror("自定义艺术风格迁移失败", msg, parent=self)
 
     def _on_close(self):
         if self._running:

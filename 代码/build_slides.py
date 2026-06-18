@@ -1,8 +1,10 @@
 """
 build_slides.py — 生成演示文稿 HTML（自写 CSS 暗色主题，零外部依赖）
-运行: E:\miniconda3\envs\ai-service\python.exe build_slides.py
+运行: E:\miniconda3\envs\ai-service\python.exe 代码\build_slides.py
 输出: ../演示文稿.html（单文件，浏览器直接打开）
 """
+from __future__ import annotations
+
 import base64
 import json
 import os
@@ -10,7 +12,6 @@ import os
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PROJ = os.path.dirname(ROOT)
 GALLERY = os.path.join(PROJ, "结果", "gallery")
-STYLES = os.path.join(PROJ, "素材", "风格图")
 OUT = os.path.join(PROJ, "演示文稿.html")
 
 
@@ -20,238 +21,189 @@ def b64(path):
 
 
 def img(name, folder=GALLERY):
-    p = os.path.join(folder, name)
-    if not os.path.exists(p):
-        print(f"  [WARN] missing: {p}")
+    path = os.path.join(folder, name)
+    if not os.path.exists(path):
+        print(f"  [WARN] missing: {path}")
         return ""
-    return b64(p)
+    return b64(path)
 
 
 metrics = json.load(open(os.path.join(GALLERY, "metrics.json"), encoding="utf-8"))
 
 CSS = r"""
-:root{--bg:#0a0e1a;--card:#111827;--card2:#0f172a;--accent:#d4a054;--blue:#5b8cff;--green:#80d98c;--red:#ff7b7b;--txt:#e2e8f0;--dim:#a8b4cf;--border:rgba(255,255,255,.08)}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;overflow:hidden}
-.slide{display:none;flex-direction:column;justify-content:center;align-items:center;height:100vh;padding:48px 88px;position:relative;overflow:hidden}
-.slide.active{display:flex}.left-align{align-items:flex-start;text-align:left}.center{text-align:center}.slide>*{width:100%;max-width:1060px}.center>*{margin-left:auto;margin-right:auto}
-.nav{position:fixed;bottom:22px;right:30px;z-index:10;font-size:13px;color:var(--dim);display:flex;gap:14px;align-items:center}.nav button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}.nav button:hover{color:#fff;border-color:var(--accent)}.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);transition:width .3s;z-index:10}
-h1{font-size:46px;font-weight:700;letter-spacing:.5px;line-height:1.25}h2{font-size:31px;font-weight:700;margin-bottom:22px;line-height:1.35}h3{font-size:19px;font-weight:600;color:var(--accent);margin-bottom:10px}p,.item{font-size:17px;line-height:1.65;color:var(--txt)}.sub{font-size:20px;color:var(--dim);margin-top:12px;font-weight:400}.tag{display:inline-block;font-size:13px;padding:3px 12px;border-radius:999px;background:rgba(212,160,84,.15);color:var(--accent);margin-bottom:15px;font-weight:600;letter-spacing:.5px}.accent{color:var(--accent)}.blue{color:var(--blue)}.green{color:var(--green)}b{font-weight:700}
-.cols{display:flex;gap:36px;width:100%;align-items:flex-start}.col{flex:1;min-width:0}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:17px 21px;margin-bottom:13px}.card h3{margin-bottom:6px;font-size:18px}.card p{font-size:15px;color:var(--dim);line-height:1.55}.mini{font-size:13px;color:var(--dim);line-height:1.45}
-table{border-collapse:collapse;width:100%;font-size:14px;margin-top:4px}th{text-align:left;padding:8px 11px;color:var(--dim);font-weight:600;border-bottom:2px solid rgba(255,255,255,.1);font-size:13px}td{padding:7px 11px;border-bottom:1px solid rgba(255,255,255,.04)}tr:last-child td{border-bottom:none}tr.hl td{background:rgba(212,160,84,.1);color:#fff;font-weight:600}
-.flow{display:flex;gap:0;align-items:stretch;width:100%;margin-top:8px}.flow .box{flex:1;padding:16px 13px;border:1px solid rgba(255,255,255,.1);text-align:center;background:rgba(255,255,255,.025)}.flow .box:first-child{border-radius:10px 0 0 10px}.flow .box:last-child{border-radius:0 10px 10px 0}.flow .box h3{font-size:14px;margin-bottom:6px}.flow .box p{font-size:13px;color:var(--dim);line-height:1.4}.flow .arrow{flex:0 0 28px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:18px}
-.varch{display:flex;flex-direction:column;gap:0;width:100%;margin-top:8px}.varch .vbox{padding:13px 20px;border:1px solid rgba(255,255,255,.1);border-top:none;text-align:center}.varch .vbox:first-child{border-top:1px solid rgba(255,255,255,.1);border-radius:10px 10px 0 0}.varch .vbox:last-child{border-radius:0 0 10px 10px}.varch .vbox h3{font-size:14px;margin-bottom:4px}.varch .vbox p{font-size:13px;color:var(--dim);line-height:1.4}.varch .varrow{text-align:center;color:var(--accent);font-size:14px;padding:3px 0;border-left:1px solid rgba(255,255,255,.1);border-right:1px solid rgba(255,255,255,.1)}
-.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}.problem{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px}.problem h3{font-size:17px;margin-bottom:7px}.problem p{font-size:14px;color:var(--dim);line-height:1.5}.problem strong{color:var(--txt)}
-.img-row{display:flex;gap:16px;justify-content:center;width:100%;margin-top:8px}.img-row .img-item{flex:1;min-width:0;text-align:center}.img-row .img-item img{width:100%;height:auto;max-height:195px;object-fit:contain;border-radius:6px;display:block;margin:0 auto;box-shadow:0 4px 18px rgba(0,0,0,.35)}.img-row .img-item .cap{font-size:13px;color:var(--dim);margin-top:5px}.footer{position:fixed;bottom:22px;left:30px;font-size:12px;color:rgba(255,255,255,.18)}
+:root{--bg:#0a0e1a;--card:#111827;--accent:#d4a054;--blue:#5b8cff;--green:#80d98c;--red:#ff7b7b;--txt:#e2e8f0;--dim:#a8b4cf;--border:rgba(255,255,255,.08)}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;overflow:hidden}
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;height:100vh;padding:48px 88px;position:relative;overflow:hidden}.slide.active{display:flex}.left-align{align-items:flex-start;text-align:left}.center{text-align:center}.slide>*{width:100%;max-width:1060px}.center>*{margin-left:auto;margin-right:auto}
+h1{font-size:45px;font-weight:700;line-height:1.25;letter-spacing:.4px}h2{font-size:31px;font-weight:700;line-height:1.35;margin-bottom:22px}h3{font-size:18px;font-weight:600;color:var(--accent);margin-bottom:8px}p,.item{font-size:17px;line-height:1.65}.sub{font-size:20px;color:var(--dim);margin-top:12px}.tag{display:inline-block;font-size:13px;padding:3px 12px;border-radius:999px;background:rgba(212,160,84,.15);color:var(--accent);margin-bottom:15px;font-weight:600}.accent{color:var(--accent)}.blue{color:var(--blue)}.green{color:var(--green)}b{font-weight:700}
+.cols{display:flex;gap:34px;width:100%;align-items:flex-start}.col{flex:1;min-width:0}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:13px}.card p{font-size:15px;color:var(--dim);line-height:1.55}.mini{font-size:13px;color:var(--dim);line-height:1.45}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;width:100%}.grid.two{grid-template-columns:repeat(2,1fr)}.grid.four{grid-template-columns:repeat(4,1fr)}.cell{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}.cell p{font-size:14px;color:var(--dim);line-height:1.5}.cell strong{color:var(--txt)}
+.flow{display:flex;gap:0;align-items:stretch;width:100%;margin-top:8px}.flow .box{flex:1;padding:15px 12px;border:1px solid rgba(255,255,255,.1);text-align:center;background:rgba(255,255,255,.025)}.flow .box:first-child{border-radius:10px 0 0 10px}.flow .box:last-child{border-radius:0 10px 10px 0}.flow .box h3{font-size:14px;margin-bottom:5px}.flow .box p{font-size:13px;color:var(--dim);line-height:1.38}.flow .arrow{flex:0 0 27px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:18px}
+.img-row{display:flex;gap:16px;justify-content:center;width:100%;margin-top:8px}.img-item{flex:1;min-width:0;text-align:center}.img-item img{width:100%;height:auto;max-height:192px;object-fit:contain;border-radius:6px;display:block;margin:0 auto;box-shadow:0 4px 18px rgba(0,0,0,.35)}.img-item .cap{font-size:13px;color:var(--dim);margin-top:5px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:4px}th{text-align:left;padding:8px 11px;color:var(--dim);font-weight:600;border-bottom:2px solid rgba(255,255,255,.1);font-size:13px}td{padding:7px 11px;border-bottom:1px solid rgba(255,255,255,.04)}tr.hl td{background:rgba(212,160,84,.1);color:#fff;font-weight:600}
+.nav{position:fixed;bottom:22px;right:30px;z-index:10;font-size:13px;color:var(--dim);display:flex;gap:14px;align-items:center}.nav button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim);padding:6px 14px;border-radius:6px;cursor:pointer}.nav button:hover{color:#fff;border-color:var(--accent)}.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);transition:width .3s;z-index:10}.footer{position:fixed;bottom:22px;left:30px;font-size:12px;color:rgba(255,255,255,.18)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}.slide.active>*{animation:fadeUp .5s ease both}.slide.active>*:nth-child(2){animation-delay:.07s}.slide.active>*:nth-child(3){animation-delay:.14s}.slide.active>*:nth-child(4){animation-delay:.21s}.slide.active>*:nth-child(5){animation-delay:.28s}
 """
 
 slides = []
 
-slides.append(f"""
+slides.append("""
 <section class="slide active center" id="s0">
   <span class="tag">数字图像处理 · 期末项目</span>
-  <h1>老照片修复与风格化迁移纪念</h1>
-  <p class="sub">从家庭老照片修复，到艺术纪念版生成</p>
+  <h1>家庭老照片修复与纪念化生成</h1>
+  <p class="sub">定制修复模式 · 传统纪念模板 · VGG 高级艺术风格扩展</p>
   <p style="font-size:14px;color:var(--dim);margin-top:30px">华东师范大学 软件工程学院 · 2026</p>
 </section>
 """)
 
-slides.append(f"""
+slides.append("""
 <section class="slide left-align" id="s1">
-  <span class="tag">应用动机</span>
-  <h2>为什么是老照片修复</h2>
+  <span class="tag">应用判断</span>
+  <h2>家庭老照片不适合只做“算法工具箱”</h2>
   <div class="cols">
     <div class="col">
-      <div class="card"><h3>真实需求</h3><p>家庭老照片常见发黄、灰蒙、噪点、折痕和划痕，修复前后差异直观，容易形成可演示的完整应用。</p></div>
-      <div class="card"><h3>处理链完整</h3><p>一张照片通常需要去噪、去偏色、增强、锐化、局部修补等多步组合，不是单一滤镜即可完成。</p></div>
-      <div class="card"><h3>纪念价值</h3><p>修复版保留真实记忆；艺术版可做相册封面、纪念海报或礼物卡片，让风格迁移自然服务于主题。</p></div>
+      <div class="card"><h3>用户不会先选算法</h3><p>普通用户不会判断该用 NLM、CLAHE、维纳滤波还是 USM，他们只知道“照片发黄、颗粒多、人像不清楚”。</p></div>
+      <div class="card"><h3>老照片是混合退化</h3><p>一张照片往往同时存在黄化、褪色、低对比、扫描颗粒、轻微模糊和折痕。</p></div>
+      <div class="card"><h3>纪念需求不等于名画风格</h3><p>家庭照片更适合相册、胶片、明信片、淡彩手绘这类温和风格。</p></div>
     </div>
-    <div class="col" style="flex:0 0 360px;display:flex;align-items:center;justify-content:center">
-      <img src="{img('一键修复_真实.jpg')}" style="max-width:100%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.5)">
-    </div>
+    <div class="col"><img src="%s" style="max-width:100%%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.5)"></div>
   </div>
 </section>
-""")
+""" % img("custom_温和修复.jpg"))
 
 slides.append("""
 <section class="slide left-align" id="s2">
-  <span class="tag">用户流程</span>
-  <h2>从导入照片到纪念版输出</h2>
-  <div class="flow">
-    <div class="box" style="background:rgba(91,140,255,.06)"><h3 class="blue">导入</h3><p>打开家庭老照片</p></div>
-    <div class="arrow">→</div>
-    <div class="box" style="background:rgba(212,160,84,.06)"><h3>诊断</h3><p>偏色 / 噪声 / 模糊 / 划痕</p></div>
-    <div class="arrow">→</div>
-    <div class="box" style="background:rgba(128,217,140,.06)"><h3 class="green">修复</h3><p>一键修复 + 针对性精修</p></div>
-    <div class="arrow">→</div>
-    <div class="box" style="background:rgba(212,160,84,.06)"><h3>纪念版</h3><p>艺术风格迁移</p></div>
-    <div class="arrow">→</div>
-    <div class="box" style="background:rgba(255,255,255,.04)"><h3>导出</h3><p>保存结果 / 对比图</p></div>
-  </div>
-  <div class="card" style="margin-top:26px;border-color:var(--accent)">
-    <h3>设计重点</h3>
-    <p>普通用户按“照片问题”操作；高级用户进入算法工具箱继续调参。功能不是孤立罗列，而是围绕一次真实修复任务组织。</p>
+  <span class="tag">退化特点</span>
+  <h2>从“问题诊断”改为“场景化修复模式”</h2>
+  <div class="grid">
+    <div class="cell"><h3>普通家庭旧照</h3><p><strong>目标：</strong>自然改善，不过度处理<br><strong>模式：</strong>温和修复</p></div>
+    <div class="cell"><h3>泛黄褪色</h3><p><strong>目标：</strong>去掉过量黄化，保留暖色<br><strong>模式：</strong>泛黄褪色修复</p></div>
+    <div class="cell"><h3>黑白旧照</h3><p><strong>目标：</strong>增强灰度层次和轮廓<br><strong>模式：</strong>黑白旧照增强</p></div>
+    <div class="cell"><h3>扫描颗粒</h3><p><strong>目标：</strong>减少颗粒，保护人像边缘<br><strong>模式：</strong>扫描颗粒修复</p></div>
+    <div class="cell"><h3>人像不清</h3><p><strong>目标：</strong>增强中等边缘，抑制噪声放大<br><strong>模式：</strong>人像清晰化</p></div>
+    <div class="cell"><h3>折痕划痕</h3><p><strong>目标：</strong>辅助检测细线破损并修补<br><strong>模式：</strong>折痕划痕辅助修复</p></div>
   </div>
 </section>
 """)
 
 slides.append("""
 <section class="slide left-align" id="s3">
-  <span class="tag">问题地图</span>
-  <h2>老照片退化问题 → 处理策略</h2>
-  <div class="problem-grid">
-    <div class="problem"><h3>发黄偏色</h3><p><strong>现象：</strong>整体偏黄、肤色不自然<br><strong>处理：</strong>白平衡</p></div>
-    <div class="problem"><h3>低对比 / 灰蒙</h3><p><strong>现象：</strong>层次弱、轮廓不突出<br><strong>处理：</strong>CLAHE / Gamma</p></div>
-    <div class="problem"><h3>颗粒噪声</h3><p><strong>现象：</strong>扫描颗粒、椒盐点<br><strong>处理：</strong>中值 / NLM / 双边</p></div>
-    <div class="problem"><h3>轻微模糊</h3><p><strong>现象：</strong>边缘和人脸细节弱<br><strong>处理：</strong>USM / 维纳滤波</p></div>
-    <div class="problem"><h3>划痕折痕</h3><p><strong>现象：</strong>白线、裂痕、破损<br><strong>处理：</strong>掩膜 + inpaint</p></div>
-    <div class="problem"><h3>纪念化需求</h3><p><strong>现象：</strong>想做封面或海报<br><strong>处理：</strong>Gatys 风格迁移</p></div>
+  <span class="tag">系统结构</span>
+  <h2>三层入口：定制修复 · 纪念模板 · 高级工具箱</h2>
+  <div class="grid">
+    <div class="cell" style="border-color:var(--accent)"><h3>家庭老照片修复</h3><p>温和修复、泛黄褪色、黑白旧照、扫描颗粒、人像清晰化、折痕划痕辅助修复。</p></div>
+    <div class="cell" style="border-color:var(--green)"><h3 class="green">纪念版生成</h3><p>复古相册、暖色胶片、纪念明信片、淡彩手绘，均为传统图像处理即时模板。</p></div>
+    <div class="cell" style="border-color:var(--blue)"><h3 class="blue">高级工具箱</h3><p>增强、去噪、锐化、恢复、频域、小波、形态学和分割，用于课堂展示和精修。</p></div>
+  </div>
+  <div class="flow" style="margin-top:24px">
+    <div class="box"><h3>导入照片</h3><p>家庭老照片</p></div><div class="arrow">→</div>
+    <div class="box"><h3>选择模式</h3><p>按场景，不按算法</p></div><div class="arrow">→</div>
+    <div class="box"><h3>定制修复</h3><p>固定流水线</p></div><div class="arrow">→</div>
+    <div class="box"><h3>纪念输出</h3><p>模板 / VGG 扩展</p></div>
   </div>
 </section>
 """)
 
-slides.append("""
+slides.append(f"""
 <section class="slide left-align" id="s4">
-  <span class="tag">系统总览</span>
-  <h2>普通修复入口 + 高级算法工具箱</h2>
-  <div class="cols">
-    <div class="col">
-      <div class="card" style="border-color:var(--accent)"><h3>普通修复入口</h3><p>一键温和修复、去黄偏色、提亮增强、去颗粒噪声、增强清晰度、划痕/折痕修复、艺术纪念版生成。</p></div>
-      <div class="card"><h3>高级算法工具箱</h3><p>增强、去噪、锐化、分割、形态学、恢复、频域、小波等完整功能保留，用于课堂展示和精修调参。</p></div>
-    </div>
-    <div class="col">
-      <div class="varch">
-        <div class="vbox" style="background:rgba(212,160,84,.06)"><h3>GUI 层 · tkinter</h3><p>修复向导 · 并排预览 · 动态参数 · 撤销 / 重置 · 导出</p></div>
-        <div class="varrow">▼ ndarray</div>
-        <div class="vbox" style="background:rgba(91,140,255,.06)"><h3 class="blue">算法核心 · dip/ + style/</h3><p>一键修复流水线 · 经典图像处理 · Gatys 风格迁移</p></div>
-        <div class="varrow">▼</div>
-        <div class="vbox" style="background:rgba(128,217,140,.06)"><h3 class="green">底层依赖</h3><p>OpenCV · NumPy · SciPy · PyWavelets · PyTorch</p></div>
-      </div>
-    </div>
+  <span class="tag">定制算法 1</span>
+  <h2>温和修复：保留旧照质感的默认方案</h2>
+  <div class="img-row"><div class="img-item"><img src="{img('custom_温和修复.jpg')}"><p class="cap">轻度去噪 + 保守增强 + 温和锐化</p></div></div>
+  <div class="flow" style="margin-top:18px">
+    <div class="box"><h3>轻度 NLM</h3><p>减少颗粒，不抹平人物</p></div><div class="arrow">→</div>
+    <div class="box"><h3>黄化校正</h3><p>保留少量暖色</p></div><div class="arrow">→</div>
+    <div class="box"><h3>低强度 CLAHE</h3><p>提升局部层次</p></div><div class="arrow">→</div>
+    <div class="box"><h3>亮度 USM</h3><p>只轻微恢复细节</p></div>
   </div>
 </section>
 """)
 
 slides.append(f"""
 <section class="slide left-align" id="s5">
-  <span class="tag">一键修复</span>
-  <h2>稳定、自然、不过度处理的默认流水线</h2>
-  <div class="img-row" style="max-width:720px">
-    <div class="img-item"><img src="{img('一键修复_合成.jpg')}"><p class="cap">合成老照片一键修复</p></div>
-    <div class="img-item"><img src="{img('一键修复_真实.jpg')}"><p class="cap">真实老照片一键修复</p></div>
-  </div>
-  <div class="flow" style="margin-top:18px">
-    <div class="box" style="background:rgba(91,140,255,.06)"><h3 class="blue">去噪</h3><p>先减少颗粒，避免后续放大噪点</p></div>
-    <div class="arrow">→</div>
-    <div class="box" style="background:rgba(212,160,84,.06)"><h3>去偏色</h3><p>白平衡缓解发黄、偏棕</p></div>
-    <div class="arrow">→</div>
-    <div class="box" style="background:rgba(212,160,84,.06)"><h3>增强</h3><p>CLAHE 提升局部层次</p></div>
-    <div class="arrow">→</div>
-    <div class="box" style="background:rgba(128,217,140,.06)"><h3 class="green">锐化</h3><p>USM 轻微恢复细节</p></div>
-  </div>
+  <span class="tag">定制算法 2</span>
+  <h2>泛黄褪色修复：去黄，但不去掉记忆感</h2>
+  <div class="img-row"><div class="img-item"><img src="{img('custom_泛黄褪色修复.jpg')}"><p class="cap">LAB 空间限幅校正黄化</p></div></div>
+  <div class="card" style="margin-top:16px"><p>简单白平衡容易把老照片调得过冷。本模式在 LAB 空间估计 b 通道黄化偏移，只去掉过量黄化，并保留少量暖色；再对 L 通道做 CLAHE，轻微恢复饱和度。</p></div>
 </section>
 """)
 
 slides.append(f"""
 <section class="slide left-align" id="s6">
-  <span class="tag">去黄与提亮</span>
-  <h2>从“发黄灰蒙”到“色彩更自然”</h2>
-  <div class="img-row">
-    <div class="img-item"><img src="{img('ch04_直方图均衡.jpg')}"><p class="cap">直方图均衡</p></div>
-    <div class="img-item"><img src="{img('ch04_CLAHE.jpg')}"><p class="cap">CLAHE 自适应增强</p></div>
-    <div class="img-item"><img src="{img('ch04_伽马变换.jpg')}"><p class="cap">Gamma 提亮暗部</p></div>
-  </div>
-  <div class="card" style="margin-top:15px">
-    <p>白平衡校正通道偏移；CLAHE 分块增强局部对比并限制过曝；Gamma 针对暗部提亮。它们共同解决老照片常见的发黄、偏暗和灰蒙问题。</p>
+  <span class="tag">定制算法 3</span>
+  <h2>黑白旧照增强：灰度层次与旧相纸质感</h2>
+  <div class="img-row"><div class="img-item"><img src="{img('custom_黑白旧照增强.jpg')}"><p class="cap">灰度层次增强 + 轻微暖纸色</p></div></div>
+  <div class="flow" style="margin-top:18px">
+    <div class="box"><h3>灰度化</h3><p>聚焦明暗层次</p></div><div class="arrow">→</div>
+    <div class="box"><h3>轻度去噪</h3><p>减少纸面颗粒</p></div><div class="arrow">→</div>
+    <div class="box"><h3>S 曲线</h3><p>增强中间调</p></div><div class="arrow">→</div>
+    <div class="box"><h3>暖纸色</h3><p>模拟旧相纸</p></div>
   </div>
 </section>
 """)
 
 slides.append(f"""
 <section class="slide left-align" id="s7">
-  <span class="tag">去颗粒噪声</span>
-  <h2>噪声抑制与细节保留的平衡</h2>
+  <span class="tag">定制算法 4</span>
+  <h2>颗粒修复与人像清晰化：保护人物边缘</h2>
   <div class="img-row">
-    <div class="img-item"><img src="{img('ch06_中值滤波.jpg')}"><p class="cap">中值滤波：去孤立噪点</p></div>
-    <div class="img-item"><img src="{img('ch06_高斯滤波.jpg')}"><p class="cap">高斯滤波：平滑噪声</p></div>
-    <div class="img-item"><img src="{img('ch06_非局部均值.jpg')}"><p class="cap">NLM：自相似去噪</p></div>
+    <div class="img-item"><img src="{img('custom_扫描颗粒修复.jpg')}"><p class="cap">扫描颗粒修复</p></div>
+    <div class="img-item"><img src="{img('custom_人像清晰化.jpg')}"><p class="cap">人像清晰化</p></div>
   </div>
-  <div style="margin-top:14px;display:flex;gap:22px;width:100%">
-    <div class="card" style="flex:0 0 245px;text-align:center;padding:12px 16px"><p class="mini">中值滤波 PSNR</p><p style="font-size:24px;font-weight:700;color:var(--accent)">17.38 → 22.74 dB</p><p class="mini">+5.36 dB</p></div>
-    <div class="card" style="flex:1;padding:12px 16px"><p>中值适合椒盐点；双边和 NLM 更注重保边与自然度。实际修复中不只看指标，也要避免把老照片质感完全抹平。</p></div>
-  </div>
+  <div class="card" style="margin-top:15px"><p>颗粒修复在 YCrCb 空间中让色度通道强去噪、亮度通道弱去噪，并用 Canny 边缘权重保护轮廓；人像清晰化只增强中等边缘，暗部噪声由亮度 gate 抑制。</p></div>
 </section>
 """)
 
 slides.append(f"""
 <section class="slide left-align" id="s8">
-  <span class="tag">划痕与模糊修复</span>
-  <h2>局部破损修补 + 退化模型恢复</h2>
+  <span class="tag">定制算法 5</span>
+  <h2>折痕划痕辅助修复：自动检测 + 用户掩膜</h2>
   <div class="img-row">
-    <div class="img-item"><img src="{img('ch09_划痕修复.jpg')}"><p class="cap">inpaint 划痕修复</p></div>
-    <div class="img-item"><img src="{img('ch09_退化模拟.jpg')}"><p class="cap">运动模糊退化模拟</p></div>
-    <div class="img-item"><img src="{img('ch09_维纳滤波.jpg')}"><p class="cap">维纳滤波恢复</p></div>
+    <div class="img-item"><img src="{img('custom_折痕划痕辅助修复.jpg')}"><p class="cap">自动辅助修复</p></div>
+    <div class="img-item"><img src="{img('custom_折痕划痕_自动加手动掩膜.jpg')}"><p class="cap">自动 + 手动掩膜</p></div>
   </div>
-  <div class="card" style="margin-top:14px;border-color:var(--accent)">
-    <p>划痕修复：白色掩膜标出待修补区域，inpaint 用周围像素自动填补。模糊恢复：退化模型 <b>g = f*h + n</b>，维纳滤波用噪功比 K 在恢复细节与抑制噪声之间折中。</p>
-  </div>
+  <div class="card" style="margin-top:15px"><p>使用 top-hat / black-hat 形态学操作提取细亮线和细暗线，得到候选划痕掩膜；复杂破损可加载用户白色掩膜补充，最后用 inpaint 填补。</p></div>
 </section>
 """)
 
 slides.append(f"""
 <section class="slide left-align" id="s9">
-  <span class="tag">高级工具箱</span>
-  <h2>保留完整算法能力，用于展示与精修</h2>
+  <span class="tag">纪念模板</span>
+  <h2>主流程使用传统图像处理纪念风格</h2>
   <div class="img-row">
-    <div class="img-item"><img src="{img('ch05_Canny.jpg')}"><p class="cap">边缘检测</p></div>
-    <div class="img-item"><img src="{img('ch08_开运算.jpg')}"><p class="cap">形态学开运算</p></div>
-    <div class="img-item"><img src="{img('ch03_频谱.jpg')}"><p class="cap">傅里叶频谱</p></div>
+    <div class="img-item"><img src="{img('memory_复古相册风.jpg')}"><p class="cap">复古相册风</p></div>
+    <div class="img-item"><img src="{img('memory_暖色胶片风.jpg')}"><p class="cap">暖色胶片风</p></div>
   </div>
-  <div class="card" style="margin-top:14px">
-    <p>这些功能不是普通用户的第一入口，但能支持课堂展示：从空间域、频域、多分辨率和结构处理等角度观察同一张照片的变化。</p>
+  <div class="img-row">
+    <div class="img-item"><img src="{img('memory_纪念明信片风.jpg')}"><p class="cap">纪念明信片风</p></div>
+    <div class="img-item"><img src="{img('memory_淡彩手绘风.jpg')}"><p class="cap">淡彩手绘风</p></div>
   </div>
 </section>
 """)
 
-slides.append("""
+slides.append(f"""
 <section class="slide left-align" id="s10">
-  <span class="tag">艺术纪念版</span>
-  <h2>Gatys 风格迁移：修复后的再创作</h2>
+  <span class="tag">高级功能</span>
+  <h2>VGG 自定义艺术风格迁移：保留，但不做默认主风格</h2>
   <div class="cols">
+    <div class="col"><img src="{img('vgg_家庭暖调风格迁移.jpg')}" style="max-width:100%;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.35)"><p class="mini" style="text-align:center;margin-top:6px">家庭暖调风格迁移结果</p></div>
     <div class="col">
-      <div class="card"><h3>内容表示</h3><p>用预训练 VGG19 的深层特征保留人物、姿态和画面布局。</p></div>
-      <div class="card"><h3>风格表示</h3><p>用多层特征的 Gram 矩阵表示笔触、纹理和色彩相关性。</p></div>
-      <div class="card"><h3>像素优化</h3><p>从内容图出发，用 L-BFGS 优化输出图像素，最小化内容损失与风格损失。</p></div>
-    </div>
-    <div class="col" style="flex:0 0 320px">
-      <div class="varch">
-        <div class="vbox" style="background:rgba(212,160,84,.08)"><p>修复照片 + 风格图</p></div>
-        <div class="varrow">▼</div>
-        <div class="vbox" style="background:rgba(91,140,255,.08)"><p>VGG19 特征提取</p></div>
-        <div class="varrow">▼</div>
-        <div class="vbox" style="background:rgba(91,140,255,.08)"><p>内容特征 + Gram 矩阵</p></div>
-        <div class="varrow">▼</div>
-        <div class="vbox" style="background:rgba(128,217,140,.08)"><p>L-BFGS 像素优化</p></div>
-        <div class="varrow">▼</div>
-        <div class="vbox" style="background:rgba(212,160,84,.08)"><p>艺术纪念版</p></div>
-      </div>
+      <div class="card"><h3>为什么保留 VGG</h3><p>Gatys 方法体现 CNN 特征图和 Gram 矩阵，支持任意用户上传风格图，适合作为高级自定义功能。</p></div>
+      <div class="card"><h3>为什么不做默认</h3><p>逐图优化较慢，且名画风格不一定符合家庭照片纪念语境；默认纪念版改用传统模板，即时且更温和。</p></div>
+      <div class="card"><h3>风格参考</h3><p>新增暖调家庭记忆风格图，替代《星空》作为主展示风格。</p></div>
     </div>
   </div>
 </section>
 """)
 
 slides.append(f"""
-<section class="slide center" id="s11">
-  <span class="tag">纪念版效果</span>
-  <h2>修复版保留真实，艺术版用于纪念</h2>
-  <img src="{img('风格迁移_老照片星空.jpg')}" style="max-width:600px;width:100%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.4)">
-  <p style="font-size:14px;color:var(--dim);margin-top:8px">修复后老照片 × 梵高《星空》</p>
-  <div style="display:flex;gap:16px;justify-content:center;margin-top:15px">
-    <div><img src="{img('starry_night.jpg', STYLES)}" style="height:78px;border-radius:4px"><p class="mini">星空</p></div>
-    <div><img src="{img('great_wave.jpg', STYLES)}" style="height:78px;border-radius:4px"><p class="mini">神奈川冲浪里</p></div>
+<section class="slide left-align" id="s11">
+  <span class="tag">GUI 流程</span>
+  <h2>左侧第一屏就是家庭照片定制模式</h2>
+  <div class="grid two">
+    <div class="cell"><h3>家庭老照片修复</h3><p>温和修复、泛黄褪色、黑白旧照、扫描颗粒、人像清晰化、折痕划痕辅助修复。</p></div>
+    <div class="cell"><h3>纪念版生成</h3><p>相册风、胶片风、明信片风、淡彩手绘，以及自定义艺术风格迁移（VGG）。</p></div>
+    <div class="cell"><h3>高级算法工具箱</h3><p>保留完整传统图像处理能力，支持课堂展示和精修调参。</p></div>
+    <div class="cell"><h3>输出</h3><p>保存结果、导出前后对比图，报告和 PPT 的图也由同一套脚本生成。</p></div>
   </div>
-  <p style="margin-top:12px;font-size:15px;color:var(--dim)">风格强度可调 · 支持自定义风格图 · 后台线程 + 进度条</p>
 </section>
 """)
 
@@ -266,15 +218,10 @@ for m in metrics:
 slides.append(f"""
 <section class="slide left-align" id="s12">
   <span class="tag">量化评估</span>
-  <h2>合成老照片：PSNR / SSIM 对比</h2>
-  <div class="cols" style="align-items:flex-start">
-    <div class="col">
-      <table><tr><th>方法</th><th>PSNR (dB)</th><th>SSIM</th></tr>{metrics_rows}</table>
-    </div>
-    <div class="col" style="flex:0 0 382px;text-align:center;display:flex;flex-direction:column;justify-content:center">
-      <img src="{img('metrics_chart.jpg')}" style="max-width:100%;border-radius:6px">
-      <div class="card" style="margin-top:12px;text-align:left"><p>PSNR 衡量像素接近程度；增强和白平衡会重映射像素，指标未必最高，但主观对比度和色彩可能更好。</p></div>
-    </div>
+  <h2>合成样张可量化，真实照片看主观自然度</h2>
+  <div class="cols">
+    <div class="col"><table><tr><th>方法</th><th>PSNR</th><th>SSIM</th></tr>{metrics_rows}</table></div>
+    <div class="col" style="flex:0 0 390px"><img src="{img('metrics_chart.jpg')}" style="max-width:100%;border-radius:6px"><div class="card" style="margin-top:12px"><p>定制修复主动调整色彩、边缘和质感，不追求单一 PSNR 最大；中值版指标最高是因为合成噪声与中值滤波匹配。</p></div></div>
   </div>
 </section>
 """)
@@ -282,34 +229,27 @@ slides.append(f"""
 slides.append(f"""
 <section class="slide left-align" id="s13">
   <span class="tag">真实案例</span>
-  <h2>真实老照片：问题诊断与改善</h2>
-  <div class="img-row" style="max-width:870px">
-    <div class="img-item"><img src="{img('一键修复_真实.jpg')}"><p class="cap">案例 #1：偏色、低对比、颗粒改善</p></div>
-    <div class="img-item"><img src="{img('一键修复_真实2.jpg')}"><p class="cap">案例 #2：整体提亮、轮廓更清楚</p></div>
+  <h2>从真实照片出发，看修复与纪念输出</h2>
+  <div class="img-row">
+    <div class="img-item"><img src="{img('custom_温和修复.jpg')}"><p class="cap">温和修复：自然改善</p></div>
+    <div class="img-item"><img src="{img('memory_纪念明信片风.jpg')}"><p class="cap">纪念明信片：适合展示</p></div>
+    <div class="img-item"><img src="{img('vgg_家庭暖调风格迁移.jpg')}"><p class="cap">VGG 高级风格：自定义扩展</p></div>
   </div>
-  <div class="problem-grid" style="grid-template-columns:repeat(4,1fr);margin-top:16px">
-    <div class="problem"><h3>偏色</h3><p>发黄减轻，色彩更中性</p></div>
-    <div class="problem"><h3>对比度</h3><p>灰蒙感降低，人物更突出</p></div>
-    <div class="problem"><h3>噪声</h3><p>背景颗粒减少，保留质感</p></div>
-    <div class="problem"><h3>自然度</h3><p>默认强度温和，避免过修</p></div>
-  </div>
+  <div class="card" style="margin-top:15px"><p>主流程是传统处理滤镜：快、稳、符合家庭照片语境；VGG 作为高级功能保留，让用户能上传自己的艺术风格。</p></div>
 </section>
 """)
 
 slides.append("""
 <section class="slide left-align" id="s14">
   <span class="tag">总结</span>
-  <h2>围绕“修复 + 纪念”的完整应用</h2>
-  <div class="cols">
-    <div class="col">
-      <div class="card"><h3>应用完整</h3><p>从导入、问题诊断、一键修复、针对性精修，到艺术纪念版和结果导出，形成完整用户流程。</p></div>
-      <div class="card"><h3>算法扎实</h3><p>经典图像处理功能完整保留，既能支撑修复任务，也能用于课堂演示和参数实验。</p></div>
-    </div>
-    <div class="col">
-      <div class="card" style="border-color:var(--accent)"><h3>纪念化输出</h3><p>Gatys 风格迁移让修复后的老照片从“保存真实”进一步扩展到“艺术再创作”。</p></div>
-      <div class="card"><h3>Q & A</h3><p>谢谢老师和同学，欢迎提问。</p></div>
-    </div>
+  <h2>从“工具箱”升级为“定制化家庭老照片应用”</h2>
+  <div class="grid two">
+    <div class="cell"><h3>修复主线更真实</h3><p>用户按家庭照片场景选择模式，而不是先理解算法参数。</p></div>
+    <div class="cell"><h3>算法组合更定制</h3><p>新增黄化校正、颗粒保护、人像清晰、划痕辅助等固定流水线。</p></div>
+    <div class="cell"><h3>纪念输出更贴合</h3><p>主流程用相册、胶片、明信片、淡彩手绘模板，而不是默认名画风格。</p></div>
+    <div class="cell"><h3>高级能力仍保留</h3><p>完整工具箱和 VGG 自定义艺术风格迁移仍可用于课程展示与扩展。</p></div>
   </div>
+  <p class="sub" style="text-align:center;margin-top:20px">谢谢老师和同学，欢迎提问。</p>
 </section>
 """)
 
@@ -329,14 +269,14 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>老照片修复与风格化迁移纪念 · 期末项目</title>
+<title>家庭老照片修复与纪念化生成 · 期末项目</title>
 <style>{CSS}</style>
 </head>
 <body>
 <div class="progress" id="bar"></div>
 {slides_html}
 <div class="nav"><button onclick="go(-1)">← 上一页</button><span id="pn"></span><button onclick="go(1)">下一页 →</button></div>
-<div class="footer">老照片修复与风格化迁移纪念 · 数字图像处理</div>
+<div class="footer">家庭老照片修复与纪念化生成 · 数字图像处理</div>
 <script>{JS}</script>
 </body>
 </html>
@@ -345,6 +285,6 @@ html = f"""<!DOCTYPE html>
 with open(OUT, "w", encoding="utf-8") as f:
     f.write(html)
 
-sz = os.path.getsize(OUT) / 1024 / 1024
+size = os.path.getsize(OUT) / 1024 / 1024
 print(f"OK: {OUT}")
-print(f"Size: {sz:.1f} MB, Slides: {len(slides)}")
+print(f"Size: {size:.1f} MB, Slides: {len(slides)}")

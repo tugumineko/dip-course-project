@@ -24,7 +24,8 @@ if CODE not in sys.path:
 
 from utils.imgio import imread, imwrite
 from dip import (basic, enhance, smooth, sharpen, segment,
-                 morphology, frequency, restore, wavelet, pipeline)
+                 morphology, frequency, restore, wavelet, pipeline,
+                 family_restore, commemorative)
 
 PREVIEW_MAX = 420
 STYLE_DIR = os.path.join(PROJ, "素材", "风格图")
@@ -49,25 +50,7 @@ def _fit(pil, mx):
 # ── application-oriented wrappers ──────────────────────
 
 def _guide_gentle_restore(img):
-    return pipeline.one_click_restore(
-        img, denoise="nlmeans", color_correct=True,
-        enhance_method="clahe", do_sharpen=True)
-
-
-def _guide_color_fix(img):
-    return enhance.white_balance(img)
-
-
-def _guide_brighten(img):
-    return enhance.clahe(img, clip=2.0, grid=8)
-
-
-def _guide_denoise(img):
-    return smooth.nlmeans(img, h=8)
-
-
-def _guide_sharpen(img):
-    return sharpen.unsharp_mask(img, amount=0.6)
+    return family_restore.gentle_restore(img)
 
 
 def _motion_blur(img, length=15, angle=0):
@@ -93,12 +76,19 @@ def _wiener_deblur(img, length=15, angle=0, k=0.01):
 #   "bool"  -> ()
 
 OP_GROUPS = [
-    ("老照片修复向导", [
-        ("一键温和修复", _guide_gentle_restore, []),
-        ("去黄偏色", _guide_color_fix, []),
-        ("提亮与增强", _guide_brighten, []),
-        ("去颗粒噪声", _guide_denoise, []),
-        ("增强清晰度", _guide_sharpen, []),
+    ("家庭老照片修复", [
+        ("温和修复", family_restore.gentle_restore, []),
+        ("泛黄褪色修复", family_restore.restore_faded_yellow_photo, []),
+        ("黑白旧照增强", family_restore.restore_bw_photo, []),
+        ("扫描颗粒修复", family_restore.reduce_photo_grain, []),
+        ("人像清晰化", family_restore.portrait_clarity, []),
+        ("折痕划痕辅助修复", family_restore.scratch_assisted_inpaint, []),
+    ]),
+    ("纪念版生成", [
+        ("复古相册风", commemorative.vintage_album_style, []),
+        ("暖色胶片风", commemorative.warm_film_style, []),
+        ("纪念明信片风", commemorative.postcard_style, []),
+        ("淡彩手绘风", commemorative.soft_handpainted_style, []),
     ]),
     ("基础操作", [
         ("灰度化", basic.to_gray, []),
@@ -321,10 +311,12 @@ class App:
 
         for title, ops in OP_GROUPS:
             self._add_group(inner, title, ops)
-            if title == "老照片修复向导":
-                ttk.Button(inner, text="    划痕/折痕修复（选择掩膜）",
-                           command=self._do_inpaint).pack(fill=tk.X, padx=10, pady=1)
-                ttk.Button(inner, text="    生成艺术纪念版",
+            if title == "家庭老照片修复":
+                ttk.Button(inner, text="    手动掩膜修复划痕",
+                           command=self._do_inpaint).pack(fill=tk.X, padx=10, pady=(1, 5))
+                ttk.Separator(inner).pack(fill=tk.X, pady=4)
+            if title == "纪念版生成":
+                ttk.Button(inner, text="    自定义艺术风格迁移（VGG）",
                            command=self._open_style_panel).pack(fill=tk.X, padx=10, pady=(1, 5))
                 ttk.Separator(inner).pack(fill=tk.X, pady=4)
 
@@ -630,7 +622,7 @@ class App:
             self._push_history()
             self.current = result
             self._update_preview()
-            self._status("已应用: 艺术纪念版生成")
+            self._status("已应用: 自定义艺术风格迁移")
 
     # ── view dialogs ────────────────────────────────────
 
