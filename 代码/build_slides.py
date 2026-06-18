@@ -57,13 +57,13 @@ slides.append("""
 
 slides.append("""
 <section class="slide left-align" id="s1">
-  <span class="tag">应用判断</span>
-  <h2>家庭老照片不适合只做“算法工具箱”</h2>
+  <span class="tag">项目需求</span>
+  <h2>家庭老照片需要修复，也需要纪念化输出</h2>
   <div class="cols">
     <div class="col">
-      <div class="card"><h3>用户不会先选算法</h3><p>普通用户不会判断该用 NLM、CLAHE、维纳滤波还是 USM，他们只知道“照片发黄、颗粒多、人像不清楚”。</p></div>
-      <div class="card"><h3>老照片是混合退化</h3><p>一张照片往往同时存在黄化、褪色、低对比、扫描颗粒、轻微模糊和折痕。</p></div>
-      <div class="card"><h3>纪念需求不等于名画风格</h3><p>家庭照片更适合相册、胶片、明信片、淡彩手绘这类温和风格。</p></div>
+      <div class="card"><h3>修复质量问题</h3><p>家庭旧照常见发黄、褪色、灰蒙、扫描颗粒、轻微模糊、折痕划痕等问题，需要有针对性的修复流程。</p></div>
+      <div class="card"><h3>保留旧照质感</h3><p>修复目标不是把照片变成现代手机照片，而是让它更清楚、更干净，同时保留年代感和家庭记忆。</p></div>
+      <div class="card"><h3>生成纪念成果</h3><p>修复后的照片可进一步生成相册风、胶片风、明信片风、淡彩手绘等纪念版，用于保存和展示。</p></div>
     </div>
     <div class="col"><img src="%s" style="max-width:100%%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.5)"></div>
   </div>
@@ -72,8 +72,8 @@ slides.append("""
 
 slides.append("""
 <section class="slide left-align" id="s2">
-  <span class="tag">退化特点</span>
-  <h2>从“问题诊断”改为“场景化修复模式”</h2>
+  <span class="tag">修复需求</span>
+  <h2>每类照片问题对应一个定制修复模块</h2>
   <div class="grid">
     <div class="cell"><h3>普通家庭旧照</h3><p><strong>目标：</strong>自然改善，不过度处理<br><strong>模式：</strong>温和修复</p></div>
     <div class="cell"><h3>泛黄褪色</h3><p><strong>目标：</strong>去掉过量黄化，保留暖色<br><strong>模式：</strong>泛黄褪色修复</p></div>
@@ -88,11 +88,11 @@ slides.append("""
 slides.append("""
 <section class="slide left-align" id="s3">
   <span class="tag">系统结构</span>
-  <h2>三层入口：定制修复 · 纪念模板 · 高级工具箱</h2>
+  <h2>四个模块完成“修复、纪念、扩展、展示”</h2>
   <div class="grid">
     <div class="cell" style="border-color:var(--accent)"><h3>家庭老照片修复</h3><p>温和修复、泛黄褪色、黑白旧照、扫描颗粒、人像清晰化、折痕划痕辅助修复。</p></div>
     <div class="cell" style="border-color:var(--green)"><h3 class="green">纪念版生成</h3><p>复古相册、暖色胶片、纪念明信片、淡彩手绘，均为传统图像处理即时模板。</p></div>
-    <div class="cell" style="border-color:var(--blue)"><h3 class="blue">高级工具箱</h3><p>增强、去噪、锐化、恢复、频域、小波、形态学和分割，用于课堂展示和精修。</p></div>
+    <div class="cell" style="border-color:var(--blue)"><h3 class="blue">高级算法功能</h3><p>增强、去噪、锐化、恢复、频域、小波、形态学和分割，用于调参、实验和课程展示。</p></div>
   </div>
   <div class="flow" style="margin-top:24px">
     <div class="box"><h3>导入照片</h3><p>家庭老照片</p></div><div class="arrow">→</div>
@@ -197,11 +197,11 @@ slides.append(f"""
 slides.append(f"""
 <section class="slide left-align" id="s11">
   <span class="tag">GUI 流程</span>
-  <h2>左侧第一屏就是家庭照片定制模式</h2>
+  <h2>按使用顺序组织：修复 → 纪念 → 高级功能</h2>
   <div class="grid two">
     <div class="cell"><h3>家庭老照片修复</h3><p>温和修复、泛黄褪色、黑白旧照、扫描颗粒、人像清晰化、折痕划痕辅助修复。</p></div>
     <div class="cell"><h3>纪念版生成</h3><p>相册风、胶片风、明信片风、淡彩手绘，以及自定义艺术风格迁移（VGG）。</p></div>
-    <div class="cell"><h3>高级算法工具箱</h3><p>保留完整传统图像处理能力，支持课堂展示和精修调参。</p></div>
+    <div class="cell"><h3>高级算法功能</h3><p>提供完整传统图像处理能力，支持课堂展示、精修调参和单算法实验。</p></div>
     <div class="cell"><h3>输出</h3><p>保存结果、导出前后对比图，报告和 PPT 的图也由同一套脚本生成。</p></div>
   </div>
 </section>
@@ -242,12 +242,12 @@ slides.append(f"""
 slides.append("""
 <section class="slide left-align" id="s14">
   <span class="tag">总结</span>
-  <h2>从“工具箱”升级为“定制化家庭老照片应用”</h2>
+  <h2>完成家庭老照片修复与纪念化生成系统</h2>
   <div class="grid two">
-    <div class="cell"><h3>修复主线更真实</h3><p>用户按家庭照片场景选择模式，而不是先理解算法参数。</p></div>
-    <div class="cell"><h3>算法组合更定制</h3><p>新增黄化校正、颗粒保护、人像清晰、划痕辅助等固定流水线。</p></div>
-    <div class="cell"><h3>纪念输出更贴合</h3><p>主流程用相册、胶片、明信片、淡彩手绘模板，而不是默认名画风格。</p></div>
-    <div class="cell"><h3>高级能力仍保留</h3><p>完整工具箱和 VGG 自定义艺术风格迁移仍可用于课程展示与扩展。</p></div>
+    <div class="cell"><h3>修复可用</h3><p>六个定制修复模块分别处理泛黄、褪色、颗粒、人像不清、折痕划痕等问题。</p></div>
+    <div class="cell"><h3>输出可展示</h3><p>四个纪念模板生成相册、胶片、明信片、淡彩手绘等家庭风格成果。</p></div>
+    <div class="cell"><h3>风格可扩展</h3><p>VGG 自定义艺术风格迁移支持上传任意风格图，提供高级个性化输出。</p></div>
+    <div class="cell"><h3>算法可解释</h3><p>高级算法功能支撑增强、去噪、锐化、恢复、频域、小波等方法展示。</p></div>
   </div>
   <p class="sub" style="text-align:center;margin-top:20px">谢谢老师和同学，欢迎提问。</p>
 </section>
