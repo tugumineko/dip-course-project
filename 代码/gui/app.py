@@ -1,8 +1,8 @@
-"""老照片修复与增强馆 -- tkinter 主窗口 (Phase 3)。
+"""老照片修复与风格化迁移纪念 -- tkinter 主窗口。
 
 功能面板(左) + 原图/结果预览(中) + 参数区(下) + 状态栏。
-覆盖课程第 2-10 章 DIP 算法 + Gatys 风格迁移(后台线程 R-2)。
-所有图像 I/O 走 imgio(R-16), PhotoImage 保留引用(R-4)。
+提供老照片修复向导、高级算法工具箱和艺术纪念版生成。
+所有图像 I/O 走 imgio，PhotoImage 保留引用。
 """
 from __future__ import annotations
 
@@ -46,7 +46,29 @@ def _fit(pil, mx):
     return pil
 
 
-# ── wrapper functions for chapter-9 restore demos ──────
+# ── application-oriented wrappers ──────────────────────
+
+def _guide_gentle_restore(img):
+    return pipeline.one_click_restore(
+        img, denoise="nlmeans", color_correct=True,
+        enhance_method="clahe", do_sharpen=True)
+
+
+def _guide_color_fix(img):
+    return enhance.white_balance(img)
+
+
+def _guide_brighten(img):
+    return enhance.clahe(img, clip=2.0, grid=8)
+
+
+def _guide_denoise(img):
+    return smooth.nlmeans(img, h=8)
+
+
+def _guide_sharpen(img):
+    return sharpen.unsharp_mask(img, amount=0.6)
+
 
 def _motion_blur(img, length=15, angle=0):
     psf = restore.motion_blur_kernel(int(length), angle)
@@ -71,6 +93,13 @@ def _wiener_deblur(img, length=15, angle=0, k=0.01):
 #   "bool"  -> ()
 
 OP_GROUPS = [
+    ("老照片修复向导", [
+        ("一键温和修复", _guide_gentle_restore, []),
+        ("去黄偏色", _guide_color_fix, []),
+        ("提亮与增强", _guide_brighten, []),
+        ("去颗粒噪声", _guide_denoise, []),
+        ("增强清晰度", _guide_sharpen, []),
+    ]),
     ("基础操作", [
         ("灰度化", basic.to_gray, []),
         ("转彩色", basic.to_bgr, []),
@@ -208,7 +237,7 @@ class App:
 
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("老照片修复与增强馆")
+        self.root.title("老照片修复与风格化迁移纪念")
         self.root.geometry("1280x800")
         self.root.minsize(960, 640)
 
@@ -292,12 +321,12 @@ class App:
 
         for title, ops in OP_GROUPS:
             self._add_group(inner, title, ops)
-
-        ttk.Separator(inner).pack(fill=tk.X, pady=4)
-        ttk.Button(inner, text="风格迁移 [进阶]",
-                   command=self._open_style_panel).pack(fill=tk.X, padx=4, pady=2)
-        ttk.Button(inner, text="划痕修复 [加载掩膜]",
-                   command=self._do_inpaint).pack(fill=tk.X, padx=4, pady=2)
+            if title == "老照片修复向导":
+                ttk.Button(inner, text="    划痕/折痕修复（选择掩膜）",
+                           command=self._do_inpaint).pack(fill=tk.X, padx=10, pady=1)
+                ttk.Button(inner, text="    生成艺术纪念版",
+                           command=self._open_style_panel).pack(fill=tk.X, padx=10, pady=(1, 5))
+                ttk.Separator(inner).pack(fill=tk.X, pady=4)
 
         def _wheel(e):
             canvas.yview_scroll(-1 * (e.delta // 120), "units")
@@ -571,7 +600,7 @@ class App:
             messagebox.showwarning("提示", "请先打开图片")
             return
         path = filedialog.askopenfilename(
-            title="选择掩膜图片 (白色=待修复区域)",
+            title="选择掩膜图片（白色区域 = 划痕/折痕/破损）",
             filetypes=[("图片", "*.jpg *.png *.bmp"), ("所有", "*.*")])
         if not path:
             return
@@ -584,7 +613,7 @@ class App:
         self._push_history()
         self.current = restore.inpaint(self.current, mask)
         self._update_preview()
-        self._status("已应用: 划痕修复 (Inpaint)")
+        self._status("已应用: 划痕/折痕修复 (Inpaint)")
 
     def _open_style_panel(self):
         if self.current is None:
@@ -601,7 +630,7 @@ class App:
             self._push_history()
             self.current = result
             self._update_preview()
-            self._status("已应用: 风格迁移")
+            self._status("已应用: 艺术纪念版生成")
 
     # ── view dialogs ────────────────────────────────────
 
@@ -657,10 +686,10 @@ class App:
 
     def _show_about(self):
         messagebox.showinfo("关于",
-            "老照片修复与增强馆\n\n"
+            "老照片修复与风格化迁移纪念\n\n"
             "ECNU SEI 数字图像处理 2026 期末项目\n"
             "指导老师: 曹桂涛 教授\n\n"
-            "覆盖: 第2~10章经典DIP + Gatys风格迁移\n"
+            "面向老照片修复、精修与艺术纪念版生成\n"
             "框架: OpenCV + PyTorch + tkinter")
 
     # ── status ──────────────────────────────────────────

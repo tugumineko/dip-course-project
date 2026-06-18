@@ -1,6 +1,6 @@
-"""风格迁移子面板 -- 后台线程运行 Gatys 优化法，避免 UI 卡死 (R-2)。
+"""艺术纪念版生成面板 -- 后台线程运行 Gatys 优化法，避免 UI 卡死。
 
-从主窗口点击 "风格迁移 [进阶]" 打开此面板。
+从主窗口点击“生成艺术纪念版”打开此面板。
 选择/上传风格图 -> 调节参数 -> 后台线程 stylize() -> 完成后回调主窗口。
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ class StylePanel(tk.Toplevel):
         on_done:     callback(result_bgr) 迁移完成后调用
         """
         super().__init__(parent)
-        self.title("图像风格迁移")
+        self.title("艺术纪念版生成")
         self.geometry("560x500")
         self.resizable(False, False)
         self.transient(parent)
@@ -201,7 +201,7 @@ class StylePanel(tk.Toplevel):
         self._running = False
         self._btn_go.configure(state="normal")
         self._stat.set(f"失败: {msg}")
-        messagebox.showerror("风格迁移失败", msg, parent=self)
+        messagebox.showerror("艺术纪念版生成失败", msg, parent=self)
 
     def _on_close(self):
         if self._running:

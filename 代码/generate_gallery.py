@@ -1,7 +1,7 @@
 """Phase 4: 批量生成对比图 + PSNR/SSIM 指标表。
 
 为报告/演讲稿/幻灯片准备素材:
-  1. 每章核心操作的 before/after 对比图 (用合成+真实老照片)
+  1. 核心操作的 before/after 对比图 (用合成+真实老照片)
   2. 一键修复 + 各去噪方法的 PSNR/SSIM 量化对照表
   3. 风格迁移效果图 (如已有则跳过, 因 GPU 耗时)
 
@@ -97,16 +97,16 @@ print(f"\n产出目录: {GALLERY}\n")
 
 
 # ═══════════════════════════════════════════════════════
-# 1. 各章对比图 (用真实老照片展示效果)
+# 1. 核心操作对比图 (用真实老照片展示效果)
 # ═══════════════════════════════════════════════════════
-print("== 1. 各章操作对比图 ==")
+print("== 1. 核心操作对比图 ==")
 
-# 第二章: 灰度化
+# 基础操作: 灰度化
 gray = basic.to_gray(demo)
 save("ch02_灰度化.jpg",
-     side_by_side(demo, gray, "原图", "灰度化", "第二章 灰度化"))
+     side_by_side(demo, gray, "原图", "灰度化", "基础灰度化"))
 
-# 第四章: 对比度增强
+# 对比度增强
 for name, func, label in [
     ("直方图均衡", enhance.hist_equalize, "直方图均衡化"),
     ("CLAHE", enhance.clahe, "CLAHE 自适应均衡"),
@@ -115,7 +115,7 @@ for name, func, label in [
 ]:
     result = func(demo)
     save(f"ch04_{name}.jpg",
-         side_by_side(demo, result, "原图", label, f"第四章 {label}"))
+         side_by_side(demo, result, "原图", label, label))
 
 # 直方图对比图
 fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
@@ -131,13 +131,13 @@ for ax, im, title in [(axes[0], demo, "原图直方图"),
         ax.bar(range(256), h, color="gray", width=1)
     ax.set_xlim(0, 255)
     ax.set_title(title)
-fig.suptitle("第四章 直方图均衡 -- 直方图对比", fontweight="bold")
+fig.suptitle("直方图均衡 -- 直方图对比", fontweight="bold")
 fig.tight_layout()
 fig.savefig(os.path.join(GALLERY, "ch04_直方图对比.jpg"), dpi=150)
 plt.close(fig)
 print("  ch04_直方图对比.jpg")
 
-# 第六章: 平滑去噪
+# 平滑去噪
 for name, func, label in [
     ("中值滤波", lambda im: smooth.median_blur(im, 5), "中值滤波 (k=5)"),
     ("高斯滤波", lambda im: smooth.gaussian_blur(im, 5, 1.0), "高斯滤波 (k=5)"),
@@ -146,9 +146,9 @@ for name, func, label in [
 ]:
     result = func(demo)
     save(f"ch06_{name}.jpg",
-         side_by_side(demo, result, "原图", label, f"第六章 {label}"))
+         side_by_side(demo, result, "原图", label, label))
 
-# 第七章: 锐化
+# 锐化
 for name, func, label in [
     ("USM锐化", lambda im: sharpen.unsharp_mask(im, amount=1.5), "USM 锐化 (amount=1.5)"),
     ("Laplacian", lambda im: sharpen.laplacian_sharpen(im, 1.5), "Laplacian 锐化"),
@@ -156,9 +156,9 @@ for name, func, label in [
 ]:
     result = func(demo)
     save(f"ch07_{name}.jpg",
-         side_by_side(demo, result, "原图", label, f"第七章 {label}"))
+         side_by_side(demo, result, "原图", label, label))
 
-# 第五章: 分割/边缘
+# 分割/边缘
 for name, func, label in [
     ("Otsu", lambda im: segment.otsu(im)[0], "Otsu 自动阈值"),
     ("Canny", lambda im: segment.canny(im, 80, 160), "Canny 边缘检测"),
@@ -166,9 +166,9 @@ for name, func, label in [
 ]:
     result = func(demo)
     save(f"ch05_{name}.jpg",
-         side_by_side(demo, result, "原图", label, f"第五章 {label}"))
+         side_by_side(demo, result, "原图", label, label))
 
-# 第八章: 形态学 (在二值图上操作更直观)
+# 形态学 (在二值图上操作更直观)
 binary = segment.otsu(demo)[0]
 for name, func, label in [
     ("腐蚀", lambda im: morphology.erode(im, 3, 2), "腐蚀 (k=3, iter=2)"),
@@ -178,9 +178,9 @@ for name, func, label in [
 ]:
     result = func(binary)
     save(f"ch08_{name}.jpg",
-         side_by_side(binary, result, "二值图", label, f"第八章 {label}"))
+         side_by_side(binary, result, "二值图", label, label))
 
-# 第九章: 图像恢复 (用合成图展示, 因有干净原图可对照)
+# 图像恢复 (用合成图展示, 因有干净原图可对照)
 psf = restore.motion_blur_kernel(15, 0)
 blurred = cv2.filter2D(basic.to_gray(clean), -1, psf)
 noisy = restore.add_gaussian_noise(blurred, sigma=5)
@@ -188,40 +188,40 @@ inv = restore.inverse_filter(noisy, psf, eps=0.02)
 wie = restore.wiener_filter(noisy, psf, k=0.01)
 save("ch09_退化模拟.jpg",
      side_by_side(clean, noisy, "干净原图", "运动模糊+噪声 (模拟退化)",
-                  "第九章 退化模型 g=h*f+n"))
+                  "退化模型 g=h*f+n"))
 save("ch09_逆滤波.jpg",
      side_by_side(noisy, inv, "退化图", "逆滤波恢复",
-                  "第九章 逆滤波"))
+                  "逆滤波"))
 save("ch09_维纳滤波.jpg",
      side_by_side(noisy, wie, "退化图", "维纳滤波恢复",
-                  "第九章 维纳滤波"))
+                  "维纳滤波"))
 if mask is not None:
     scratched = old
     repaired = restore.inpaint(scratched, mask)
     save("ch09_划痕修复.jpg",
          side_by_side(scratched, repaired, "有划痕", "Inpaint 修复",
-                      "第九章 划痕修复 (Inpaint)"))
+                      "划痕修复 (Inpaint)"))
 
-# 第3.2章: 频域
+# 频域
 spec = frequency.spectrum(demo)
 lp = frequency.butterworth_lowpass(demo, d0=40)
 hp = frequency.butterworth_highpass(demo, d0=40)
 save("ch03_频谱.jpg",
      side_by_side(demo, spec, "原图", "傅里叶幅度谱",
-                  "第3.2章 傅里叶频谱"))
+                  "傅里叶频谱"))
 save("ch03_低通.jpg",
      side_by_side(demo, lp, "原图", "巴特沃斯低通 (D0=40)",
-                  "第3.2章 频域低通滤波"))
+                  "频域低通滤波"))
 save("ch03_高通.jpg",
      side_by_side(demo, hp, "原图", "巴特沃斯高通 (D0=40)",
-                  "第3.2章 频域高通滤波"))
+                  "频域高通滤波"))
 
-# 第十章: 小波
+# 小波
 if wavelet.available():
     wd = wavelet.wavelet_denoise(demo, thresh=25)
     save("ch10_小波去噪.jpg",
          side_by_side(demo, wd, "原图", "小波软阈值去噪",
-                      "第十章 小波去噪"))
+                      "小波去噪"))
 
 
 # ═══════════════════════════════════════════════════════
