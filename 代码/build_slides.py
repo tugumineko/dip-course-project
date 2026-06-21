@@ -13,11 +13,12 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 PROJ = os.path.dirname(ROOT)
 GALLERY = os.path.join(PROJ, "结果", "gallery")
 OUT = os.path.join(PROJ, "演示文稿.html")
+DEMO_VIDEO = os.path.join(PROJ, "素材", "演示视频", "demo.mp4")
 
 
-def b64(path):
+def b64(path, mime="image/jpeg"):
     with open(path, "rb") as f:
-        return f"data:image/jpeg;base64,{base64.b64encode(f.read()).decode()}"
+        return f"data:{mime};base64,{base64.b64encode(f.read()).decode()}"
 
 
 def img(name, folder=GALLERY):
@@ -28,6 +29,16 @@ def img(name, folder=GALLERY):
     return b64(path)
 
 
+def demo_video():
+    if not os.path.exists(DEMO_VIDEO):
+        print(f"  [WARN] missing: {DEMO_VIDEO}")
+        return ""
+    size_mb = os.path.getsize(DEMO_VIDEO) / 1024 / 1024
+    print(f"  embedding video: {DEMO_VIDEO} ({size_mb:.1f} MB)")
+    return b64(DEMO_VIDEO, "video/mp4")
+
+
+video_src = demo_video()
 metrics = json.load(open(os.path.join(GALLERY, "metrics.json"), encoding="utf-8"))
 
 CSS = r"""
@@ -194,17 +205,19 @@ slides.append(f"""
 </section>
 """)
 
+video_block = (
+    f'<video src="{video_src}" controls preload="metadata" poster="{img("custom_温和修复.jpg")}"></video>'
+    if video_src
+    else '<div class="video-placeholder"><h3>录制后运行 build_slides.py 嵌入视频</h3><p>将视频保存为：素材/演示视频/demo.mp4；建议 70–90 秒，横屏 16:9。</p></div>'
+)
+
 slides.append(f"""
 <section class="slide left-align" id="s11">
   <span class="tag">系统演示视频</span>
   <h2>录屏展示完整流程：修复 → 纪念 → 高级风格</h2>
   <div class="cols">
     <div class="col" style="flex:1.45">
-      <div class="video-box">
-        <video src="素材/演示视频/demo.mp4" controls preload="metadata" poster="{img('custom_温和修复.jpg')}">
-          <div class="video-placeholder"><h3>录制后放入：素材/演示视频/demo.mp4</h3><p>建议 70–90 秒，横屏 16:9，展示导入、修复、纪念模板、VGG 高级扩展和导出。</p></div>
-        </video>
-      </div>
+      <div class="video-box">{video_block}</div>
     </div>
     <div class="col">
       <div class="card"><h3>1. 导入与修复</h3><p>打开老照片，依次展示温和修复、泛黄褪色、人像清晰化或扫描颗粒修复。</p></div>
