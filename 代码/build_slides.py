@@ -38,7 +38,7 @@ h1{font-size:45px;font-weight:700;line-height:1.25;letter-spacing:.4px}h2{font-s
 .cols{display:flex;gap:34px;width:100%;align-items:flex-start}.col{flex:1;min-width:0}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:13px}.card p{font-size:15px;color:var(--dim);line-height:1.55}.mini{font-size:13px;color:var(--dim);line-height:1.45}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;width:100%}.grid.two{grid-template-columns:repeat(2,1fr)}.grid.four{grid-template-columns:repeat(4,1fr)}.cell{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}.cell p{font-size:14px;color:var(--dim);line-height:1.5}.cell strong{color:var(--txt)}
 .flow{display:flex;gap:0;align-items:stretch;width:100%;margin-top:8px}.flow .box{flex:1;padding:15px 12px;border:1px solid rgba(255,255,255,.1);text-align:center;background:rgba(255,255,255,.025)}.flow .box:first-child{border-radius:10px 0 0 10px}.flow .box:last-child{border-radius:0 10px 10px 0}.flow .box h3{font-size:14px;margin-bottom:5px}.flow .box p{font-size:13px;color:var(--dim);line-height:1.38}.flow .arrow{flex:0 0 27px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:18px}
-.img-row{display:flex;gap:16px;justify-content:center;width:100%;margin-top:8px}.img-item{flex:1;min-width:0;text-align:center}.img-item img{width:100%;height:auto;max-height:192px;object-fit:contain;border-radius:6px;display:block;margin:0 auto;box-shadow:0 4px 18px rgba(0,0,0,.35)}.img-item .cap{font-size:13px;color:var(--dim);margin-top:5px}
+.img-row{display:flex;gap:16px;justify-content:center;width:100%;margin-top:8px}.img-item{flex:1;min-width:0;text-align:center}.img-item img{width:100%;height:auto;max-height:192px;object-fit:contain;border-radius:6px;display:block;margin:0 auto;box-shadow:0 4px 18px rgba(0,0,0,.35)}.img-item .cap{font-size:13px;color:var(--dim);margin-top:5px}.video-box{width:100%;aspect-ratio:16/9;border:1px solid var(--border);border-radius:12px;background:linear-gradient(135deg,rgba(212,160,84,.12),rgba(91,140,255,.08));display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:0 4px 22px rgba(0,0,0,.35);overflow:hidden}.video-box video{width:100%;height:100%;object-fit:contain;background:#05070d}.video-placeholder{padding:28px}.video-placeholder h3{font-size:22px}.video-placeholder p{font-size:14px;color:var(--dim)}
 table{border-collapse:collapse;width:100%;font-size:14px;margin-top:4px}th{text-align:left;padding:8px 11px;color:var(--dim);font-weight:600;border-bottom:2px solid rgba(255,255,255,.1);font-size:13px}td{padding:7px 11px;border-bottom:1px solid rgba(255,255,255,.04)}tr.hl td{background:rgba(212,160,84,.1);color:#fff;font-weight:600}
 .nav{position:fixed;bottom:22px;right:30px;z-index:10;font-size:13px;color:var(--dim);display:flex;gap:14px;align-items:center}.nav button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim);padding:6px 14px;border-radius:6px;cursor:pointer}.nav button:hover{color:#fff;border-color:var(--accent)}.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);transition:width .3s;z-index:10}.footer{position:fixed;bottom:22px;left:30px;font-size:12px;color:rgba(255,255,255,.18)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}.slide.active>*{animation:fadeUp .5s ease both}.slide.active>*:nth-child(2){animation-delay:.07s}.slide.active>*:nth-child(3){animation-delay:.14s}.slide.active>*:nth-child(4){animation-delay:.21s}.slide.active>*:nth-child(5){animation-delay:.28s}
@@ -196,13 +196,21 @@ slides.append(f"""
 
 slides.append(f"""
 <section class="slide left-align" id="s11">
-  <span class="tag">GUI 流程</span>
-  <h2>按使用顺序组织：修复 → 纪念 → 高级功能</h2>
-  <div class="grid two">
-    <div class="cell"><h3>家庭老照片修复</h3><p>温和修复、泛黄褪色、黑白旧照、扫描颗粒、人像清晰化、折痕划痕辅助修复。</p></div>
-    <div class="cell"><h3>纪念版生成</h3><p>相册风、胶片风、明信片风、淡彩手绘，以及自定义艺术风格迁移（VGG）。</p></div>
-    <div class="cell"><h3>高级算法功能</h3><p>提供完整传统图像处理能力，支持课堂展示、精修调参和单算法实验。</p></div>
-    <div class="cell"><h3>输出</h3><p>保存结果、导出前后对比图，报告和 PPT 的图也由同一套脚本生成。</p></div>
+  <span class="tag">系统演示视频</span>
+  <h2>录屏展示完整流程：修复 → 纪念 → 高级风格</h2>
+  <div class="cols">
+    <div class="col" style="flex:1.45">
+      <div class="video-box">
+        <video src="素材/演示视频/demo.mp4" controls preload="metadata" poster="{img('custom_温和修复.jpg')}">
+          <div class="video-placeholder"><h3>录制后放入：素材/演示视频/demo.mp4</h3><p>建议 70–90 秒，横屏 16:9，展示导入、修复、纪念模板、VGG 高级扩展和导出。</p></div>
+        </video>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card"><h3>1. 导入与修复</h3><p>打开老照片，依次展示温和修复、泛黄褪色、人像清晰化或扫描颗粒修复。</p></div>
+      <div class="card"><h3>2. 纪念版输出</h3><p>在修复结果上生成纪念明信片风，再快速展示复古相册风或暖色胶片风。</p></div>
+      <div class="card"><h3>3. 高级扩展与导出</h3><p>展示 VGG 自定义艺术风格面板和预生成结果，最后保存或导出前后对比图。</p></div>
+    </div>
   </div>
 </section>
 """)
